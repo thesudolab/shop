@@ -330,70 +330,29 @@
 /* =========================================================
    PRODUCT CATALOG
    ---------------------------------------------------------
-   To ADD a product: copy a {...} block below and edit it.
-   To REMOVE a product: delete its {...} block.
-   Each product needs a unique "id".
-   "category" is used to auto-generate the filter buttons.
+   Products now live in a separate file: products.json
+   To ADD/REMOVE/EDIT a product, just edit products.json —
+   this HTML file does not need to change.
    ========================================================= */
-const PRODUCTS = [
-  {
-    id: "p1",
-    name: "Recon Toolkit Pro",
-    category: "Tools",
-    icon: "🛰️",
-    price: 49.00,
-    stock: "In Stock",
-    desc: "Automated reconnaissance suite for mapping external attack surfaces and exposed assets."
-  },
-  {
-    id: "p2",
-    name: "Zero-Trust Blueprint",
-    category: "Templates",
-    icon: "🧩",
-    price: 79.00,
-    stock: "In Stock",
-    desc: "Reference architecture and policy templates for enterprise zero-trust rollouts."
-  },
-  {
-    id: "p3",
-    name: "Red Team Playbook",
-    category: "Guides",
-    icon: "📕",
-    price: 35.00,
-    stock: "In Stock",
-    desc: "Step-by-step adversary emulation playbook covering full attack-chain scenarios."
-  },
-  {
-    id: "p4",
-    name: "Log Anomaly Engine",
-    category: "Tools",
-    icon: "📊",
-    price: 129.00,
-    stock: "Limited",
-    desc: "Lightweight detection engine that flags anomalous patterns across system logs."
-  },
-  {
-    id: "p5",
-    name: "CTF Training Pack",
-    category: "Training",
-    icon: "🎯",
-    price: 59.00,
-    stock: "In Stock",
-    desc: "Hands-on capture-the-flag challenge set for upskilling internal security teams."
-  },
-  {
-    id: "p6",
-    name: "Incident Response Kit",
-    category: "Templates",
-    icon: "🧯",
-    price: 89.00,
-    stock: "In Stock",
-    desc: "Runbooks, checklists, and comms templates for structured incident response."
-  }
-];
+let PRODUCTS = [];
 
 /* ===================== CART STATE ===================== */
 let cart = {};
+
+async function loadProducts(){
+  try{
+    const res = await fetch("products.json");
+    if(!res.ok) throw new Error("Failed to load products.json");
+    PRODUCTS = await res.json();
+  }catch(err){
+    document.getElementById("product-grid").innerHTML =
+      `<p style="color:var(--red);">⚠ Could not load products.json. Make sure it's in the same folder as shop.html and you're viewing this via a local/web server (not double-clicking the file).</p>`;
+    console.error(err);
+    return;
+  }
+  buildFilters();
+  renderProducts(PRODUCTS);
+}
 
 function buildFilters(){
   const cats = ["All", ...new Set(PRODUCTS.map(p => p.category))];
@@ -502,8 +461,7 @@ function checkout(){
   alert("Checkout placeholder — connect a payment provider (Stripe/Gumroad/Snipcart) here.");
 }
 
-buildFilters();
-renderProducts(PRODUCTS);
+loadProducts();
 </script>
 
 </body>
